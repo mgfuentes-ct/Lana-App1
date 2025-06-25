@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Button } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
-export default function DashboardScreen({ navigation }) {
+export default function HomeScreen({ navigation }) {
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Panel Principal</Text>
+      <Text style={styles.title}>Inicio</Text>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Saldo Actual</Text>
@@ -20,13 +20,28 @@ export default function DashboardScreen({ navigation }) {
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Gráfico de Gastos</Text>
-        {/* Aquí iría un gráfico real usando react-native-svg o librerías */}
         <Text>Gráfico tipo pastel (ejemplo)</Text>
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button title="Ir a Transacciones" onPress={() => alert('Transacciones')} />
-        <Button title="Ver Gráficas" onPress={() => alert('Gráficas')} />
+        <TouchableOpacity
+          style={styles.quickAccess}
+          onPress={() => navigation.navigate('NuevaTransacción')}
+        >
+          <Text>Nueva Transacción</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.quickAccess}
+          onPress={() => navigation.navigate('Gráficas')}
+        >
+          <Text>Ver Gráficas</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.quickAccess}
+          onPress={() => navigation.navigate('PróximosPagos')}
+        >
+          <Text>Próximos Pagos</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -66,6 +81,14 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 10,
+    flexWrap: 'wrap',
+  },
+  quickAccess: {
+    backgroundColor: '#e0e0e0',
+    padding: 15,
+    borderRadius: 8,
+    marginBottom: 10,
+    width: '48%',
+    alignItems: 'center',
   },
 });

@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
+import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    if (email && password) {
+    if (email === 'usuario@gmail.com' && password === '12345') {
       alert('Inicio de sesión exitoso');
-      navigation.navigate('Bienvenida'); // Puedes cambiar esto después
+      navigation.navigate('Home'); // Redirigir al Panel Principal
     } else {
-      alert('Por favor ingresa correo y contraseña');
+      alert('Correo o contraseña incorrectos');
     }
   };
 
@@ -35,7 +35,7 @@ const LoginScreen = ({ navigation }) => {
       />
 
       <Button title="Iniciar Sesión" onPress={handleLogin} />
-      <Button title="¿Olvidaste tu contraseña?" onPress={() => alert('Recuperar contraseña')} color="blue" />
+      <Button title="¿Olvidaste tu contraseña?" onPress={() => navigation.navigate('RecuperarContraseña')} color="blue" />
       <Button title="Volver" onPress={() => navigation.goBack()} color="#999" />
     </View>
   );

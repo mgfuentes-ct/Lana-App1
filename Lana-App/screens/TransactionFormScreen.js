@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Picker } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { View, TextInput, Button, StyleSheet, Text } from 'react-native';
 
 export default function TransactionFormScreen({ navigation }) {
   const [amount, setAmount] = useState('');
