@@ -3,17 +3,17 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // Pantalla principal con pestañas
-import MainTabNavigator from './screens/MainTabNavigator';
+import MainTabNavigator from './src/screens/MainTabNavigator';
 
 // Pantallas iniciales
-import HomeScreen from './screens/HomeScreen';
-import WelcomeScreen from './screens/WelcomeScreen';
-import RegisterScreen from './screens/RegisterScreen';
-import LoginScreen from './screens/LoginScreen';
-import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
-import TransactionFormScreen from './screens/TransactionFormScreen';
-import NotificationSettingsScreen from './screens/NotificationSettingsScreen';
-import SupportScreen from './screens/SupportScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import WelcomeScreen from './src/screens/WelcomeScreen';
+import RegisterScreen from './src/screens/RegisterScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
+import TransactionFormScreen from './src/screens/TransactionFormScreen';
+import NotificationSettingsScreen from './src/screens/NotificationSettingsScreen';
+import SupportScreen from './src/screens/SupportScreen';
 
 const Stack = createStackNavigator();
 
