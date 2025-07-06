@@ -26,6 +26,7 @@ class UsuarioRegister(BaseModel):
 
 @router.post("/auth/register")
 def registrar_usuario(user: UsuarioRegister, db: Session = Depends(get_db)):
+    print("Registrando usuario:", user.nombre, user.correo)
     existente = db.query(Usuario).filter(Usuario.correo == user.correo).first()
     if existente:
         raise HTTPException(status_code=400, detail="Correo ya registrado")
@@ -107,5 +108,5 @@ def get_perfil(usuario = Depends(obtener_usuario_actual)):
         "id": usuario.id,
         "nombre": usuario.nombre,
         "correo": usuario.correo,
-        "foto_perfil": usuario.foto_perfil
+    
     }

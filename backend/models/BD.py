@@ -11,7 +11,6 @@ class Usuario(Base):
     nombre = Column(String(100), nullable=False)
     correo = Column(String(100), unique=True, nullable=False)
     contrasena = Column(String(255), nullable=False)
-    foto_perfil = Column(Text)
     fecha_registro = Column(DateTime, default=datetime.utcnow)
 
 class CuentaBancaria(Base):
