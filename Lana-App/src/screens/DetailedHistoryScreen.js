@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Picker,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; 
 
 const transactions = [
   { id: '1', type: 'ingreso', amount: 1000, category: 'Salario', date: '2025-05-01' },

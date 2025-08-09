@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Button } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ChartsScreen() {
   return (
+    <SafeAreaView style={styles.container}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Gráficas Financieras</Text>
 
@@ -23,16 +25,17 @@ export default function ChartsScreen() {
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button title="Ver Detalle de Gráfica" onPress={() => alert('Ir a detalle')} />
+        {/* <Button title="Ver Detalle de Gráfica" onPress={() => alert('Ir a detalle')} /> */}
       </View>
     </ScrollView>
+  </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
     backgroundColor: '#fafafa',
   },
   title: {

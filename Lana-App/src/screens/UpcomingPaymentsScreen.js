@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet, Button } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 const payments = [
   { id: '1', name: 'Renta Mensual', amount: 3000, dueDate: '2025-06-01', status: 'Pendiente' },
@@ -20,22 +22,24 @@ export default function UpcomingPaymentsScreen({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Próximos Pagos</Text>
-      <FlatList
-        data={payments}
-        keyExtractor={(item) => item.id}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Próximos Pagos</Text>
+        <FlatList
+          data={payments}
+          keyExtractor={(item) => item.id}
         renderItem={renderItem}
       />
       <Button title="Volver" onPress={() => navigation.goBack()} color="#999" />
     </View>
+  </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
     backgroundColor: '#fff',
   },
   title: {

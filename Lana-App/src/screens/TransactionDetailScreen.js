@@ -30,7 +30,7 @@ export default function TransactionDetailScreen({ route, navigation }) {
         <Text style={styles.detailValue}>{transaction.description}</Text>
       </View>
 
-      <Button title="Editar" onPress={() => navigation.navigate('EditarTransacción', { transaction })} />
+      <Button title="Editar" onPress={() => navigation.navigate('EditarEliminarTransacción', { transaction })} />
       <Button title="Volver" onPress={() => navigation.goBack()} color="#999" />
     </View>
   );

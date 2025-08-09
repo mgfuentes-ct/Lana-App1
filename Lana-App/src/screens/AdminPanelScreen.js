@@ -1,8 +1,10 @@
 import React from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, Button } from 'react-native';
 
 export default function AdminPanelScreen({ navigation }) {
   return (
+    <SafeAreaView style={styles.container}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Panel Administrativo</Text>
 
@@ -25,6 +27,7 @@ export default function AdminPanelScreen({ navigation }) {
       <Button title="Ver Reportes" onPress={() => alert('Generando reportes')} />
       <Button title="Cerrar Sesión" onPress={() => navigation.goBack()} color="#999" />
     </ScrollView>
+  </SafeAreaView>
   );
 }
 
