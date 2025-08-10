@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 export default function UserProfileScreen({ navigation }) {
   const [name, setName] = useState('María José Cruz');
@@ -10,8 +12,9 @@ export default function UserProfileScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Perfil de Usuario</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Perfil de Usuario</Text>
 
       <Text style={styles.label}>Nombre:</Text>
       <TextInput
@@ -32,13 +35,14 @@ export default function UserProfileScreen({ navigation }) {
       <Button title="Guardar Cambios" onPress={handleSave} />
       <Button title="Cerrar Sesión" onPress={() => navigation.goBack()} color="#999" />
     </View>
+  </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
     backgroundColor: '#fff',
   },
   title: {

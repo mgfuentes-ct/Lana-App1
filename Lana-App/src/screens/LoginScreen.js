@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -8,7 +8,7 @@ const LoginScreen = ({ navigation }) => {
   const handleLogin = () => {
     if (email === 'usuario@gmail.com' && password === '12345') {
       alert('Inicio de sesión exitoso');
-      navigation.navigate('Home'); // Redirigir al Panel Principal
+      navigation.navigate('Main', { screen: 'Home' });
     } else {
       alert('Correo o contraseña incorrectos');
     }
@@ -16,27 +16,52 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Correo electrónico:</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="tu@email.com"
-        keyboardType="email-address"
-      />
+      <Text style={styles.title}>Bienvenido</Text>
+      <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
 
-      <Text style={styles.label}>Contraseña:</Text>
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Contraseña"
-        secureTextEntry
-      />
+      <View style={styles.form}>
+        <Text style={styles.label}>Correo electrónico</Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          placeholder="tu@email.com"
+          placeholderTextColor="#999"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
 
-      <Button title="Iniciar Sesión" onPress={handleLogin} />
-      <Button title="¿Olvidaste tu contraseña?" onPress={() => navigation.navigate('RecuperarContraseña')} color="blue" />
-      <Button title="Volver" onPress={() => navigation.goBack()} color="#999" />
+        <Text style={styles.label}>Contraseña</Text>
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Contraseña"
+          placeholderTextColor="#999"
+          secureTextEntry
+        />
+
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={handleLogin}
+        >
+          <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate('RecuperarContraseña')}
+          style={styles.forgotButton}
+        >
+          <Text style={styles.forgotButtonText}>¿Olvidaste tu contraseña?</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Text style={styles.backButtonText}>Volver</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -44,20 +69,81 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: '#f8f9fa',
     justifyContent: 'center',
+    padding: 25,
+  },
+  title: {
+    fontSize: 34,
+    fontWeight: 'bold',
+    color: '#2c3e50',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#7f8c8d',
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  form: {
+    width: '100%',
   },
   label: {
     fontSize: 16,
-    marginBottom: 5,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 8,
+    marginLeft: 5,
   },
   input: {
-    height: 40,
-    borderColor: '#ccc',
+    height: 50,
+    backgroundColor: '#ffffff',
+    borderColor: '#ddd',
     borderWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  loginButton: {
+    backgroundColor: '#3498db',
+    paddingVertical: 16,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  forgotButton: {
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  forgotButtonText: {
+    color: '#3498db',
+    fontSize: 15,
+    textDecorationLine: 'underline',
+  },
+  backButton: {
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  backButtonText: {
+    color: '#95a5a6',
+    fontSize: 15,
   },
 });
 

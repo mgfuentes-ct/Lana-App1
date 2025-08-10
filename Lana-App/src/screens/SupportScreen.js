@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Button, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SupportScreen({ navigation }) {
   const faqs = [
@@ -18,6 +19,7 @@ export default function SupportScreen({ navigation }) {
   ];
 
   return (
+    <SafeAreaView style={styles.container}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Ayuda y Soporte</Text>
 
@@ -31,6 +33,7 @@ export default function SupportScreen({ navigation }) {
       <Button title="Contactar Soporte" onPress={() => alert('Formulario de contacto')} />
       <Button title="Volver" onPress={() => navigation.goBack()} color="#999" />
     </ScrollView>
+  </SafeAreaView>
   );
 }
 

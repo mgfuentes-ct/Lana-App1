@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // ✅ Añadir
+import { SafeAreaView } from 'react-native-safe-area-context'; // ✅ Importar SafeAreaView
 
 const transactions = [
   { id: '1', type: 'egreso', amount: 500, category: 'Alimentación', date: '2025-06-01' },
@@ -17,6 +19,7 @@ export default function TransactionManagementScreen({ navigation }) {
   );
 
   return (
+    <SafeAreaView style={styles.container}>
     <View style={styles.container}>
       <Text style={styles.title}>Gestión de Transacciones</Text>
       <FlatList
@@ -26,13 +29,14 @@ export default function TransactionManagementScreen({ navigation }) {
       />
       <Button title="Filtrar" onPress={() => alert('Mostrar filtros')} />
     </View>
+  </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
     backgroundColor: '#fff',
   },
   title: {

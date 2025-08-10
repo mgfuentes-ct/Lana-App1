@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Picker } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // ✅ Añadir
 
 export default function FixedPaymentScreen({ navigation }) {
   const [name, setName] = useState('');
@@ -14,6 +15,7 @@ export default function FixedPaymentScreen({ navigation }) {
   };
 
   return (
+    <SafeAreaView style={styles.container}>
     <View style={styles.container}>
       <Text style={styles.label}>Nombre del Pago:</Text>
       <TextInput
@@ -57,13 +59,14 @@ export default function FixedPaymentScreen({ navigation }) {
       <Button title="Guardar Pago Fijo" onPress={handleSave} />
       <Button title="Cancelar" onPress={() => navigation.goBack()} color="#999" />
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
     backgroundColor: '#fff',
   },
   label: {

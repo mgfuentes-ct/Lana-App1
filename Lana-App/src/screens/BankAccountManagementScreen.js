@@ -1,3 +1,4 @@
+// src/screens/BankAccountManagementScreen.js
 import React, { useState } from 'react';
 import {
   View,
@@ -6,8 +7,11 @@ import {
   Button,
   FlatList,
   StyleSheet,
+  Alert,
   TouchableOpacity,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker'; // ✅ Import añadido
+import { GlobalStyles, Colors } from '../theme/theme'; // ✅ Estilos globales
 
 const initialAccounts = [
   { id: '1', name: 'BBVA', balance: 15000, type: 'Ahorro' },
@@ -45,30 +49,32 @@ export default function BankAccountManagementScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Gestión de Cuentas Bancarias</Text>
+    <View style={GlobalStyles.container}>
+      <Text style={GlobalStyles.title}>Gestión de Cuentas Bancarias</Text>
 
       <TextInput
-        style={styles.input}
+        style={GlobalStyles.input}
         placeholder="Nombre del banco"
         value={name}
         onChangeText={setName}
       />
 
       <TextInput
-        style={styles.input}
+        style={GlobalStyles.input}
         placeholder="Saldo inicial"
         keyboardType="numeric"
         value={balance}
         onChangeText={setBalance}
       />
 
-      <Text style={styles.label}>Tipo de cuenta:</Text>
-      <Picker selectedValue={type} onValueChange={setType}>
-        <Picker.Item label="Ahorro" value="Ahorro" />
-        <Picker.Item label="Cheques" value="Cheques" />
-        <Picker.Item label="Crédito" value="Crédito" />
-      </Picker>
+      <Text style={GlobalStyles.label}>Tipo de cuenta:</Text>
+      <View style={{ borderWidth: 1, borderColor: Colors.border, borderRadius: 8, marginBottom: 15 }}>
+        <Picker selectedValue={type} onValueChange={setType}>
+          <Picker.Item label="Ahorro" value="Ahorro" />
+          <Picker.Item label="Cheques" value="Cheques" />
+          <Picker.Item label="Crédito" value="Crédito" />
+        </Picker>
+      </View>
 
       <Button title="Agregar Cuenta" onPress={handleAddAccount} />
 
@@ -76,68 +82,25 @@ export default function BankAccountManagementScreen({ navigation }) {
         data={accounts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.accountCard}>
-            <Text style={styles.accountName}>{item.name}</Text>
+          <View style={GlobalStyles.card}>
+            <Text style={GlobalStyles.subtitle}>{item.name}</Text>
             <Text>Tipo: {item.type}</Text>
             <Text>Saldo: ${item.balance.toFixed(2)}</Text>
             <TouchableOpacity
-              style={styles.deleteButton}
+              style={[GlobalStyles.buttonSecondary, { marginTop: 10, backgroundColor: '#ffcccc' }]}
               onPress={() => handleDeleteAccount(item.id)}
             >
-              <Text style={styles.deleteText}>Eliminar</Text>
+              <Text style={{ color: 'red' }}>Eliminar</Text>
             </TouchableOpacity>
           </View>
         )}
       />
 
-      <Button title="Volver" onPress={() => navigation.goBack()} color="#999" />
+      <Button
+        title="Volver"
+        onPress={() => navigation.navigate('Main')} // ✅ Mejor que goBack()
+        color="#999"
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-  },
-  accountCard: {
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#eee',
-  },
-  accountName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  deleteButton: {
-    backgroundColor: '#ffcccc',
-    padding: 8,
-    borderRadius: 5,
-    alignSelf: 'flex-start',
-    marginTop: 5,
-  },
-  deleteText: {
-    color: 'red',
-  },
-});

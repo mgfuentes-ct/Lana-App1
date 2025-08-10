@@ -1,8 +1,10 @@
 import React from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
 export default function HomeScreen({ navigation }) {
   return (
+    <SafeAreaView style={styles.container}>
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Inicio</Text>
 
@@ -32,26 +34,29 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.quickAccess}
-          onPress={() => navigation.navigate('Gráficas')}
+          onPress={() => navigation.navigate('Charts')}
         >
           <Text>Ver Gráficas</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.quickAccess}
-          onPress={() => navigation.navigate('PróximosPagos')}
+          onPress={() => navigation.navigate('UpcomingPayments')}
         >
           <Text>Próximos Pagos</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
     backgroundColor: '#fafafa',
+    top: 3,
+    paddingBottom: 10,
   },
   title: {
     fontSize: 24,

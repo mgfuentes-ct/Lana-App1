@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const notifications = [
   { id: '1', message: 'Recordatorio: Tu pago de renta vence mañana.', date: '2025-05-29' },
@@ -16,6 +17,7 @@ export default function NotificationCenterScreen() {
   );
 
   return (
+    <SafeAreaView style={styles.container}>
     <View style={styles.container}>
       <Text style={styles.title}>Centro de Notificaciones</Text>
       <FlatList
@@ -24,13 +26,14 @@ export default function NotificationCenterScreen() {
         renderItem={renderItem}
       />
     </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 10,
     backgroundColor: '#fff',
   },
   title: {
