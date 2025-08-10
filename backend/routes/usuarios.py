@@ -1,32 +1,23 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.database import SessionLocal
-from backend.models.BD import Usuario, Sesion, Recuperacion
+from database import SessionLocal
+from models.BD import Usuario, Sesion, Recuperacion
 from passlib.hash import bcrypt
-from pydantic import BaseModel
-from backend.utils.jwt import crear_token
+from schemas.usuarios import UsuarioCreate, UsuarioOut, UsuarioUpdate
+from utils.jwt import crear_token
 from fastapi.security import OAuth2PasswordRequestForm
-from backend.utils.auth import obtener_usuario_actual, get_token_actual
+from utils.auth import obtener_usuario_actual, get_token_actual
 from datetime import datetime, timedelta
 import secrets
 
 router = APIRouter()
 
 def get_db():
-    db = SessionLocal()
-    try:
+    with SessionLocal() as db:
         yield db
-    finally:
-        db.close()
 
-class UsuarioRegister(BaseModel):
-    nombre: str
-    correo: str
-    contrasena: str
-
-@router.post("/auth/register")
-def registrar_usuario(user: UsuarioRegister, db: Session = Depends(get_db)):
-    print("Registrando usuario:", user.nombre, user.correo)
+@router.post("/auth/register", response_model=UsuarioOut)
+def registrar_usuario(user: UsuarioCreate, db: Session = Depends(get_db)):
     existente = db.query(Usuario).filter(Usuario.correo == user.correo).first()
     if existente:
         raise HTTPException(status_code=400, detail="Correo ya registrado")
@@ -34,12 +25,13 @@ def registrar_usuario(user: UsuarioRegister, db: Session = Depends(get_db)):
     nuevo_usuario = Usuario(
         nombre=user.nombre,
         correo=user.correo,
-        contrasena=bcrypt.hash(user.contrasena)
+        contrasena=bcrypt.hash(user.contrasena),
+        rol=user.rol or "usuario"
     )
     db.add(nuevo_usuario)
     db.commit()
     db.refresh(nuevo_usuario)
-    return {"mensaje": "Usuario registrado exitosamente", "usuario_id": nuevo_usuario.id}
+    return nuevo_usuario
 
 @router.post("/auth/login")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -49,6 +41,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
 
     token = crear_token({"sub": str(usuario.id)})
+    # Opcional: crear sesión aquí si quieres controlar sesiones
     return {"access_token": token, "token_type": "bearer"}
 
 @router.post("/auth/logout")
@@ -82,7 +75,7 @@ def forgot_password(correo: str, db: Session = Depends(get_db)):
     db.add(nueva)
     db.commit()
 
-    # Aquí podrías enviar el token por correo real.
+    # Aquí enviarías el token por correo real.
     return {"mensaje": "Token generado", "token": token}
 
 @router.post("/auth/reset-password")
@@ -96,17 +89,30 @@ def reset_password(token: str, nueva_contrasena: str, db: Session = Depends(get_
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    usuario.contrasena = nueva_contrasena
+    usuario.contrasena = bcrypt.hash(nueva_contrasena)  # Aquí hasheamos la nueva contraseña
     rec.usado = True
     db.commit()
 
     return {"mensaje": "Contraseña actualizada correctamente"}
 
-@router.get("/users/me")
+@router.get("/users/me", response_model=UsuarioOut)
 def get_perfil(usuario = Depends(obtener_usuario_actual)):
-    return {
-        "id": usuario.id,
-        "nombre": usuario.nombre,
-        "correo": usuario.correo,
-    
-    }
+    return usuario
+
+@router.put("/users/me", response_model=UsuarioOut)
+def actualizar_perfil(payload: UsuarioUpdate, db: Session = Depends(get_db), usuario = Depends(obtener_usuario_actual)):
+    if payload.correo:
+        # Verificar que el nuevo correo no esté en uso
+        existente = db.query(Usuario).filter(Usuario.correo == payload.correo, Usuario.id != usuario.id).first()
+        if existente:
+            raise HTTPException(status_code=400, detail="Correo ya en uso")
+
+    for key, value in payload.dict(exclude_unset=True).items():
+        if key == "contrasena":
+            setattr(usuario, key, bcrypt.hash(value))
+        else:
+            setattr(usuario, key, value)
+
+    db.commit()
+    db.refresh(usuario)
+    return usuario

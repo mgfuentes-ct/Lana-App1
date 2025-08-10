@@ -2,35 +2,34 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from backend.database import SessionLocal
-from backend.models.BD import Notificacion, ConfiguracionNotificacion
-from backend.utils.auth import obtener_usuario_actual
-from backend.schemas.notificaciones import (
-    NotificacionResponse,
-    ConfiguracionNotificacionResponse,
+from database import SessionLocal
+from models.BD import Notificacion, ConfiguracionNotificacion
+from utils.auth import obtener_usuario_actual
+from schemas.notificaciones import (
+    NotificacionOut,
+    ConfiguracionNotificacionOut,
     ConfiguracionNotificacionUpdate
 )
 
 router = APIRouter()
 
 def get_db():
-    db = SessionLocal()
-    try:
+    with SessionLocal() as db:
         yield db
-    finally:
-        db.close()
 
 # Obtener todas las notificaciones del usuario
-@router.get("/notifications", response_model=List[NotificacionResponse])
+@router.get("/notifications", response_model=List[NotificacionOut])
 def obtener_notificaciones(db: Session = Depends(get_db), usuario=Depends(obtener_usuario_actual)):
-    return db.query(Notificacion).filter(Notificacion.usuario_id == usuario.id).order_by(Notificacion.fecha_creacion.desc()).all()
+    return db.query(Notificacion)\
+        .filter(Notificacion.usuario_id == usuario.id)\
+        .order_by(Notificacion.fecha_creacion.desc())\
+        .all()
 
-# Obtener configuración actual del usuario
-@router.get("/notifications/settings", response_model=ConfiguracionNotificacionResponse)
+# Obtener configuración actual del usuario (crea si no existe)
+@router.get("/notifications/settings", response_model=ConfiguracionNotificacionOut)
 def obtener_configuracion(db: Session = Depends(get_db), usuario=Depends(obtener_usuario_actual)):
     config = db.query(ConfiguracionNotificacion).filter(ConfiguracionNotificacion.usuario_id == usuario.id).first()
     if not config:
-        # Crear configuración por defecto si no existe
         config = ConfiguracionNotificacion(usuario_id=usuario.id)
         db.add(config)
         db.commit()
@@ -38,7 +37,7 @@ def obtener_configuracion(db: Session = Depends(get_db), usuario=Depends(obtener
     return config
 
 # Actualizar configuración del usuario
-@router.put("/notifications/settings", response_model=ConfiguracionNotificacionResponse)
+@router.put("/notifications/settings", response_model=ConfiguracionNotificacionOut)
 def actualizar_configuracion(payload: ConfiguracionNotificacionUpdate, db: Session = Depends(get_db), usuario=Depends(obtener_usuario_actual)):
     config = db.query(ConfiguracionNotificacion).filter(ConfiguracionNotificacion.usuario_id == usuario.id).first()
     if not config:

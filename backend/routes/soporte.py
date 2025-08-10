@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from typing import List
 
-from backend.database import SessionLocal
-from backend.models.BD import Soporte
-from backend.utils.auth import obtener_usuario_actual
-from backend.schemas.soporte import MensajeSoporte, SoporteResponse
+from database import SessionLocal
+from models.BD import Soporte
+from utils.auth import obtener_usuario_actual
+from schemas.soporte import MensajeSoporte, SoporteOut
 
 router = APIRouter()
 
@@ -16,7 +15,7 @@ def get_db():
     finally:
         db.close()
 
-# Simulación de preguntas frecuentes estáticas
+# Preguntas frecuentes estáticas
 @router.get("/support/faq")
 def obtener_faq():
     return [
@@ -25,7 +24,8 @@ def obtener_faq():
         {"pregunta": "¿Mis datos están seguros?", "respuesta": "Sí, usamos protocolos seguros y cifrado para proteger tus datos."}
     ]
 
-@router.post("/support/message", response_model=SoporteResponse)
+# Crear mensaje de soporte
+@router.post("/support/message", response_model=SoporteOut)
 def enviar_mensaje(payload: MensajeSoporte, db: Session = Depends(get_db), usuario=Depends(obtener_usuario_actual)):
     nuevo = Soporte(usuario_id=usuario.id, **payload.dict())
     db.add(nuevo)

@@ -42,23 +42,23 @@
 #         orm_mode = True
 
 from fastapi import FastAPI
-from backend.routes import rutas  # Asegúrate de tener esto bien importado
-from backend.routes import rutas, transacciones
-from backend.routes import dashboard
-from backend.routes import pagos_fijos
-from backend.routes import cuentas_bancarias
-from backend.routes import notificaciones
-from backend.routes import soporte
-from backend.routes import graficas
+from routes import usuarios
+from routes import transacciones
+from routes import dashboard
+from routes import pagos_fijos
+from routes import presupuestos
+from routes import notificaciones
+from routes import soporte
+from routes import graficas
 
 app = FastAPI()
 
 # Rutas
-app.include_router(rutas.router)
+app.include_router(usuarios.router)
 app.include_router(transacciones.router)
 app.include_router(dashboard.router)
 app.include_router(pagos_fijos.router)
-app.include_router(cuentas_bancarias.router)
+app.include_router(presupuestos.router)
 app.include_router(notificaciones.router)
 app.include_router(soporte.router)
 app.include_router(graficas.router)

@@ -1,29 +1,36 @@
 from pydantic import BaseModel
 from datetime import date
 from typing import Optional
+from enum import Enum
+
+class TipoTransaccion(str, Enum):
+    ingreso = "ingreso"
+    egreso = "egreso"
 
 class TransaccionCreate(BaseModel):
-    cuenta_id: int
+    usuario_id: int   # Ajustar aquí si usas usuario_id
+    presupuesto_id: Optional[int] = None
     categoria_id: int
     monto: float
-    tipo: str
-    descripcion: Optional[str]
+    tipo: TipoTransaccion
+    descripcion: Optional[str] = None
     fecha: date
 
 class TransaccionUpdate(BaseModel):
-    cuenta_id: Optional[int] = None
+    presupuesto_id: Optional[int] = None
     categoria_id: Optional[int] = None
     monto: Optional[float] = None
-    tipo: Optional[str] = None
+    tipo: Optional[TipoTransaccion] = None
     descripcion: Optional[str] = None
     fecha: Optional[date] = None
 
 class TransaccionOut(BaseModel):
     id: int
-    cuenta_id: int
+    usuario_id: int
+    presupuesto_id: Optional[int]
     categoria_id: int
     monto: float
-    tipo: str
+    tipo: TipoTransaccion
     descripcion: Optional[str]
     fecha: date
 
