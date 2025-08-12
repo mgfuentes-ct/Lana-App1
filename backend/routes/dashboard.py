@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func, case, and_
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from database import SessionLocal
 from models.BD import Transaccion, PagoFijo, Notificacion, Categoria, Presupuesto
@@ -16,6 +16,132 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@router.get("/dashboard/balance")
+def obtener_balance(
+    db: Session = Depends(get_db),
+    usuario = Depends(obtener_usuario_actual)
+):
+    """Obtener el balance actual del usuario"""
+    try:
+        # Calcular ingresos totales
+        total_ingresos = db.query(func.coalesce(func.sum(Transaccion.monto), 0))\
+            .filter(Transaccion.usuario_id == usuario.id, Transaccion.tipo == 'ingreso')\
+            .scalar()
+        
+        # Calcular egresos totales
+        total_egresos = db.query(func.coalesce(func.sum(Transaccion.monto), 0))\
+            .filter(Transaccion.usuario_id == usuario.id, Transaccion.tipo == 'egreso')\
+            .scalar()
+        
+        # Calcular balance
+        balance = total_ingresos - total_egresos
+        
+        return {
+            "balance": float(balance),
+            "ingresos": float(total_ingresos),
+            "egresos": float(total_egresos)
+        }
+    except Exception as e:
+        return {"balance": 0, "ingresos": 0, "egresos": 0}
+
+@router.get("/dashboard/transacciones-recientes")
+def obtener_transacciones_recientes(
+    limite: int = Query(5, ge=1, le=50),
+    db: Session = Depends(get_db),
+    usuario = Depends(obtener_usuario_actual)
+):
+    """Obtener las transacciones más recientes del usuario"""
+    try:
+        transacciones = db.query(Transaccion)\
+            .filter(Transaccion.usuario_id == usuario.id)\
+            .order_by(Transaccion.fecha.desc())\
+            .limit(limite)\
+            .all()
+        
+        return [
+            {
+                "id": t.id,
+                "descripcion": t.descripcion,
+                "monto": float(t.monto),
+                "tipo": t.tipo,
+                "fecha": t.fecha.isoformat() if t.fecha else None,
+                "categoria": t.categoria.nombre if t.categoria else None
+            }
+            for t in transacciones
+        ]
+    except Exception as e:
+        return []
+
+@router.get("/dashboard/resumen")
+def obtener_resumen_dashboard(
+    periodo: str = Query("mes", regex="^(dia|semana|mes|año)$"),
+    db: Session = Depends(get_db),
+    usuario = Depends(obtener_usuario_actual)
+):
+    """Obtener resumen del dashboard según el período especificado"""
+    try:
+        # Calcular fechas según el período
+        hoy = datetime.now().date()
+        if periodo == "dia":
+            fecha_inicio = hoy
+            fecha_fin = hoy
+        elif periodo == "semana":
+            fecha_inicio = hoy - timedelta(days=hoy.weekday())
+            fecha_fin = fecha_inicio + timedelta(days=6)
+        elif periodo == "mes":
+            fecha_inicio = hoy.replace(day=1)
+            fecha_fin = (fecha_inicio + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+        elif periodo == "año":
+            fecha_inicio = hoy.replace(month=1, day=1)
+            fecha_fin = hoy.replace(month=12, day=31)
+        
+        # Calcular ingresos del período
+        ingresos = db.query(func.coalesce(func.sum(Transaccion.monto), 0))\
+            .filter(
+                Transaccion.usuario_id == usuario.id,
+                Transaccion.tipo == 'ingreso',
+                Transaccion.fecha >= fecha_inicio,
+                Transaccion.fecha <= fecha_fin
+            )\
+            .scalar()
+        
+        # Calcular egresos del período
+        egresos = db.query(func.coalesce(func.sum(Transaccion.monto), 0))\
+            .filter(
+                Transaccion.usuario_id == usuario.id,
+                Transaccion.tipo == 'egreso',
+                Transaccion.fecha >= fecha_inicio,
+                Transaccion.fecha <= fecha_fin
+            )\
+            .scalar()
+        
+        # Calcular ahorros (ingresos - egresos)
+        ahorros = ingresos - egresos
+        
+        return {
+            "periodo": periodo,
+            "fecha_inicio": fecha_inicio.isoformat(),
+            "fecha_fin": fecha_fin.isoformat(),
+            "ingresos": float(ingresos),
+            "gastos": float(egresos),
+            "ahorros": float(ahorros),
+            "total_transacciones": db.query(func.count(Transaccion.id))\
+                .filter(
+                    Transaccion.usuario_id == usuario.id,
+                    Transaccion.fecha >= fecha_inicio,
+                    Transaccion.fecha <= fecha_fin
+                )\
+                .scalar()
+        }
+    except Exception as e:
+        return {
+            "periodo": periodo,
+            "ingresos": 0,
+            "gastos": 0,
+            "ahorros": 0,
+            "total_transacciones": 0
+        }
 
 @router.get("/dashboard", response_model=DashboardResponse)
 def obtener_dashboard(

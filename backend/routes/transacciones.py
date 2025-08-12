@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
+from sqlalchemy import func
 
 from models.BD import Transaccion, Presupuesto, Categoria
 from schemas.transacciones import TransaccionCreate, TransaccionOut, TransaccionUpdate
@@ -16,18 +17,57 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/transactions", response_model=List[TransaccionOut])
-def obtener_transacciones(db: Session = Depends(get_db), usuario = Depends(obtener_usuario_actual)):
-    return db.query(Transaccion).filter(Transaccion.usuario_id == usuario.id).all()
+@router.get("/transacciones/categorias")
+def obtener_categorias(db: Session = Depends(get_db)):
+    """Obtener todas las categorías disponibles"""
+    categorias = db.query(Categoria).all()
+    return [
+        {
+            "id": c.id,
+            "nombre": c.nombre,
+            "tipo": c.tipo
+        }
+        for c in categorias
+    ]
 
-@router.get("/transactions/{id}", response_model=TransaccionOut)
-def detalle_transaccion(id: int, db: Session = Depends(get_db), usuario = Depends(obtener_usuario_actual)):
-    transaccion = db.query(Transaccion).filter(Transaccion.id == id, Transaccion.usuario_id == usuario.id).first()
-    if not transaccion:
-        raise HTTPException(status_code=404, detail="Transacción no encontrada")
-    return transaccion
+@router.get("/transacciones/tipos")
+def obtener_tipos_transaccion():
+    """Obtener los tipos de transacción disponibles"""
+    return [
+        {"id": "ingreso", "nombre": "Ingreso", "descripcion": "Dinero que entra"},
+        {"id": "egreso", "nombre": "Egreso", "descripcion": "Dinero que sale"}
+    ]
 
-@router.post("/transactions", response_model=TransaccionOut)
+@router.get("/transacciones", response_model=List[TransaccionOut])
+def obtener_transacciones(
+    fecha_inicio: str = Query(None, description="Fecha de inicio (YYYY-MM-DD)"),
+    fecha_fin: str = Query(None, description="Fecha de fin (YYYY-MM-DD)"),
+    tipo: str = Query(None, description="Tipo de transacción (ingreso/egreso)"),
+    categoria: int = Query(None, description="ID de la categoría"),
+    monto_min: float = Query(None, description="Monto mínimo"),
+    monto_max: float = Query(None, description="Monto máximo"),
+    db: Session = Depends(get_db), 
+    usuario = Depends(obtener_usuario_actual)
+):
+    """Obtener transacciones con filtros opcionales"""
+    query = db.query(Transaccion).filter(Transaccion.usuario_id == usuario.id)
+    
+    if fecha_inicio:
+        query = query.filter(Transaccion.fecha >= fecha_inicio)
+    if fecha_fin:
+        query = query.filter(Transaccion.fecha <= fecha_fin)
+    if tipo:
+        query = query.filter(Transaccion.tipo == tipo)
+    if categoria:
+        query = query.filter(Transaccion.categoria_id == categoria)
+    if monto_min is not None:
+        query = query.filter(Transaccion.monto >= monto_min)
+    if monto_max is not None:
+        query = query.filter(Transaccion.monto <= monto_max)
+    
+    return query.order_by(Transaccion.fecha.desc()).all()
+
+@router.post("/transacciones", response_model=TransaccionOut)
 def crear_transaccion(data: TransaccionCreate, db: Session = Depends(get_db), usuario = Depends(obtener_usuario_actual)):
     # Validar que el usuario del payload coincida con el autenticado
     if data.usuario_id != usuario.id:
@@ -62,7 +102,14 @@ def crear_transaccion(data: TransaccionCreate, db: Session = Depends(get_db), us
     db.refresh(nueva)
     return nueva
 
-@router.put("/transactions/{id}", response_model=TransaccionOut)
+@router.get("/transacciones/{id}", response_model=TransaccionOut)
+def detalle_transaccion(id: int, db: Session = Depends(get_db), usuario = Depends(obtener_usuario_actual)):
+    transaccion = db.query(Transaccion).filter(Transaccion.id == id, Transaccion.usuario_id == usuario.id).first()
+    if not transaccion:
+        raise HTTPException(status_code=404, detail="Transacción no encontrada")
+    return transaccion
+
+@router.put("/transacciones/{id}", response_model=TransaccionOut)
 def editar_transaccion(id: int, data: TransaccionUpdate, db: Session = Depends(get_db), usuario = Depends(obtener_usuario_actual)):
     transaccion = db.query(Transaccion).filter(
         Transaccion.id == id,
@@ -102,7 +149,7 @@ def editar_transaccion(id: int, data: TransaccionUpdate, db: Session = Depends(g
     db.refresh(transaccion)
     return transaccion
 
-@router.delete("/transactions/{id}")
+@router.delete("/transacciones/{id}")
 def eliminar_transaccion(id: int, db: Session = Depends(get_db), usuario = Depends(obtener_usuario_actual)):
     transaccion = db.query(Transaccion).filter(Transaccion.id == id, Transaccion.usuario_id == usuario.id).first()
     if not transaccion:
@@ -111,3 +158,9 @@ def eliminar_transaccion(id: int, db: Session = Depends(get_db), usuario = Depen
     db.delete(transaccion)
     db.commit()
     return {"mensaje": "Transacción eliminada correctamente"}
+
+# Mantener compatibilidad con la ruta anterior
+@router.get("/transactions", response_model=List[TransaccionOut])
+def obtener_transacciones_old(db: Session = Depends(get_db), usuario = Depends(obtener_usuario_actual)):
+    """Endpoint de compatibilidad - usar /transacciones en su lugar"""
+    return obtener_transacciones(db=db, usuario=usuario)
