@@ -2,13 +2,14 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
 
 // Auth / Tabs
 import AuthStack from './src/navigation/AuthStack';
 import MainTabNavigator from './src/navigation/MainTabNavigator';
 
-// Provider de autenticación
-import { AuthProvider } from './src/hooks/useAuth';
+// Importar el provider de autenticación
+import { AuthProvider, useAuth } from './src/hooks/useAuth';
 
 // Pantallas independientes que ya tenías
 import TransactionFormScreen from './src/screens/TransactionFormScreen';
@@ -25,7 +26,25 @@ import PagoFijoFormScreen from './src/screens/PagoFijoFormScreen';
 
 const Stack = createStackNavigator();
 
-export default function App() {
+// Componente que maneja la lógica de navegación basada en autenticación
+function NavigationContent() {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  console.log('🧭 NavigationContent - Estado de autenticación:', { isAuthenticated, isLoading });
+
+  // Mostrar loading mientras se verifica el estado de autenticación
+  if (isLoading) {
+    console.log('⏳ Mostrando loading...');
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#35619eff" />
+      </View>
+    );
+  }
+
+  console.log('🎯 Navegando a:', isAuthenticated ? 'Main' : 'Auth');
+  console.log('📍 Ruta seleccionada:', isAuthenticated ? 'MainTabNavigator' : 'AuthStack (Welcome)');
+
   return (
     <AuthProvider>
       <NavigationContainer>
@@ -90,3 +109,12 @@ export default function App() {
     </AuthProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+  },
+});

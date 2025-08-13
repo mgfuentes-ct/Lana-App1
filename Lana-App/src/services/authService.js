@@ -82,6 +82,33 @@ export const register = async (userData) => {
     const response = await api.post('/auth/register', userData);
 
     if (response.data && response.data.message) {
+      // Después del registro exitoso, hacer login automático
+      try {
+        const loginResponse = await api.post('/auth/login', {
+          correo: userData.correo,
+          contrasena: userData.contrasena
+        });
+
+        if (loginResponse.data && loginResponse.data.access_token) {
+          // Guardar token e información del usuario
+          await AsyncStorage.setItem('userToken', loginResponse.data.access_token);
+          await AsyncStorage.setItem('userInfo', JSON.stringify(loginResponse.data.usuario));
+          
+          // Configurar header de autorización
+          api.defaults.headers.common['Authorization'] = `Bearer ${loginResponse.data.access_token}`;
+          
+          return {
+            success: true,
+            message: response.data.message || 'Usuario registrado exitosamente',
+            user: loginResponse.data.usuario,
+            token: loginResponse.data.access_token
+          };
+        }
+      } catch (loginError) {
+        console.error('Error en login automático:', loginError);
+        // Si falla el login automático, solo retornar éxito del registro
+      }
+
       return {
         success: true,
         message: response.data.message || 'Usuario registrado exitosamente'
@@ -136,16 +163,26 @@ export const register = async (userData) => {
 
 export const logout = async () => {
   try {
+    console.log('🚪 Iniciando logout en authService...');
+    
     // Remover token e información del usuario
     await AsyncStorage.removeItem('userToken');
     await AsyncStorage.removeItem('userInfo');
+    console.log('🗑️ Datos de AsyncStorage removidos');
     
     // Limpiar headers de autorización
     delete api.defaults.headers.common['Authorization'];
+    console.log('🧹 Headers de autorización limpiados');
+    
+    // Verificar que se limpió correctamente
+    const remainingToken = await AsyncStorage.getItem('userToken');
+    const remainingUserInfo = await AsyncStorage.getItem('userInfo');
+    console.log('🔍 Verificación - Token restante:', remainingToken);
+    console.log('🔍 Verificación - UserInfo restante:', remainingUserInfo);
     
     return { success: true };
   } catch (error) {
-    console.error('Error en logout:', error);
+    console.error('❌ Error en logout:', error);
     return { success: false, message: 'Error al cerrar sesión' };
   }
 };

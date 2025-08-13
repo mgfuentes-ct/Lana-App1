@@ -25,10 +25,10 @@ api.interceptors.request.use(
     try {
       const token = await AsyncStorage.getItem(TOKEN_KEY);
       if (token) {
-        config.headers = config.headers || {};
-        if (!config.headers.Authorization) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log('🔑 Token agregado a la petición:', config.url);
+      } else {
+        console.log('⚠️ No se encontró token para la petición:', config.url);
       }
     } catch (err) {
       console.warn('No se pudo leer el token:', err?.message);

@@ -70,17 +70,39 @@ export const createTransaction = async (transactionData) => {
 // Actualizar una transacción
 export const updateTransaction = async (transactionId, transactionData) => {
   try {
+    console.log('🔄 Enviando actualización a:', `/transacciones/${transactionId}`);
+    console.log('📤 Datos enviados:', JSON.stringify(transactionData, null, 2));
+    
     const response = await api.put(`/transacciones/${transactionId}`, transactionData);
+    
+    console.log('✅ Respuesta exitosa:', response.data);
     return {
       success: true,
       data: response.data,
       message: 'Transacción actualizada exitosamente'
     };
   } catch (error) {
-    console.error('Error updating transaction:', error);
+    console.error('❌ Error updating transaction:', error);
+    console.error('❌ Error response:', error.response?.data);
+    console.error('❌ Error status:', error.response?.status);
+    // Manejar errores específicos
+    let errorMessage = 'Error al actualizar la transacción';
+    
+    if (error.response?.data?.detail) {
+      errorMessage = error.response.data.detail;
+    } else if (error.response?.status === 400) {
+      errorMessage = 'Datos inválidos. Verifica la información ingresada.';
+    } else if (error.response?.status === 404) {
+      errorMessage = 'Transacción no encontrada.';
+    } else if (error.response?.status === 403) {
+      errorMessage = 'No tienes permisos para modificar esta transacción.';
+    } else if (error.response?.status === 500) {
+      errorMessage = 'Error del servidor. Inténtalo más tarde.';
+    }
+    
     return {
       success: false,
-      message: error.response?.data?.detail || 'Error al actualizar la transacción',
+      message: errorMessage,
       error
     };
   }

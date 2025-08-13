@@ -27,6 +27,11 @@ export const AuthProvider = ({ children }) => {
     checkAuthOnStart();
   }, []);
 
+  // Debug: Log cuando cambia el estado de autenticación
+  useEffect(() => {
+    console.log('🔄 Estado de autenticación cambiado:', { isAuthenticated, user: user?.nombre });
+  }, [isAuthenticated, user]);
+
   const checkAuthOnStart = async () => {
     try {
       setIsLoading(true);
@@ -74,15 +79,33 @@ export const AuthProvider = ({ children }) => {
   // Función para limpiar el estado de autenticación (logout)
   const clearAuthState = async () => {
     try {
+      console.log('🧹 Iniciando limpieza del estado de autenticación...');
+      
+      // Limpiar AsyncStorage primero
+      await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('userInfo');
+      console.log('🗑️ AsyncStorage limpiado');
+      
+      // Luego limpiar el estado local
       setToken(null);
       setUser(null);
       setIsAuthenticated(false);
+      console.log('🔄 Estado local limpiado');
       
-      // Limpiar AsyncStorage
-      await AsyncStorage.removeItem('userToken');
-      await AsyncStorage.removeItem('userInfo');
+      // Verificar que se limpió correctamente
+      const remainingToken = await AsyncStorage.getItem('userToken');
+      const remainingUserInfo = await AsyncStorage.getItem('userInfo');
+      console.log('🔍 Verificación - Token restante:', remainingToken);
+      console.log('🔍 Verificación - UserInfo restante:', remainingUserInfo);
+      
+      // Forzar una verificación del estado después de limpiar
+      setTimeout(() => {
+        console.log('🔄 Forzando verificación del estado después del logout...');
+        checkAuthOnStart();
+      }, 100);
+      
     } catch (error) {
-      console.error('Error clearing auth state:', error);
+      console.error('❌ Error clearing auth state:', error);
     }
   };
 
