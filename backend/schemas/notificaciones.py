@@ -20,7 +20,7 @@ class NotificacionOut(NotificacionBase):
     fecha_creacion: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # ---- CONFIGURACIÓN DE NOTIFICACIONES ----
 class ConfiguracionNotificacionBase(BaseModel):
@@ -41,4 +41,4 @@ class ConfiguracionNotificacionOut(ConfiguracionNotificacionBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

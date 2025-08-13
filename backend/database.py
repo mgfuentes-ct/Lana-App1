@@ -5,7 +5,7 @@ import os
 
 # Usa tus credenciales reales aquí
 DB_USER = "root"
-DB_PASSWORD = ""
+DB_PASSWORD = "Limones4k"
 DB_HOST = "localhost"
 DB_PORT = "3306"
 DB_NAME = "LanaApp"

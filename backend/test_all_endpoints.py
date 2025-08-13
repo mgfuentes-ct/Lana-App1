@@ -8,7 +8,7 @@ import json
 from datetime import datetime
 
 # Configuración
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "http://192.168.0.105:8000"
 
 class APITester:
     def __init__(self):

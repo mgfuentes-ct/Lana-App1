@@ -15,9 +15,25 @@ import { useAuth } from '../hooks/useAuth';
 import { createTransaction, getTransactionCategories, getTransactionTypes } from '../services/transactionService';
 
 export default function TransactionFormScreen({ navigation }) {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
+
+  // Verificar autenticación al cargar el componente
+  useEffect(() => {
+    if (!isLoadingData && (!isAuthenticated || !user || !user.id)) {
+      Alert.alert(
+        'Error de Autenticación',
+        'No se pudo obtener la información del usuario. Por favor, cierra sesión e inicia sesión nuevamente.',
+        [
+          {
+            text: 'Entendido',
+            onPress: () => navigation.navigate('Auth')
+          }
+        ]
+      );
+    }
+  }, [isLoadingData, isAuthenticated, user, navigation]);
   
   // Estados del formulario
   const [amount, setAmount] = useState('');
@@ -87,11 +103,27 @@ export default function TransactionFormScreen({ navigation }) {
       return;
     }
 
+    // Verificar que el usuario esté autenticado y tenga ID
+    if (!user || !user.id) {
+      console.error('❌ Error: Usuario no autenticado o sin ID');
+      Alert.alert(
+        'Error de Autenticación',
+        'No se pudo obtener la información del usuario. Por favor, cierra sesión e inicia sesión nuevamente.',
+        [
+          {
+            text: 'Entendido',
+            onPress: () => navigation.navigate('Auth')
+          }
+        ]
+      );
+      return;
+    }
+
     try {
       setIsLoading(true);
 
       const transactionData = {
-        usuario_id: user.id,
+        usuario_id: parseInt(user.id), // Asegurar que sea número
         monto: parseFloat(amount),
         tipo: type,
         categoria_id: parseInt(category),

@@ -1,8 +1,64 @@
 import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View, Text, StyleSheet, ScrollView, Button } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, Alert } from 'react-native';
+import { useAuth } from '../hooks/useAuth';
+import { logout } from '../services/authService';
 
 export default function AdminPanelScreen({ navigation }) {
+  const { clearAuthState } = useAuth();
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro de que quieres cerrar sesión?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Cerrar Sesión',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // Llamar al servicio de logout
+              const result = await logout();
+              
+              if (result.success) {
+                // Limpiar el estado de autenticación
+                await clearAuthState();
+                
+                // Mostrar mensaje de éxito y forzar navegación
+                Alert.alert(
+                  'Sesión Cerrada', 
+                  'Has cerrado sesión correctamente',
+                  [
+                    {
+                      text: 'OK',
+                      onPress: () => {
+                        console.log('✅ Logout completado exitosamente');
+                        // Forzar navegación a la pantalla de autenticación
+                        navigation.reset({
+                          index: 0,
+                          routes: [{ name: 'Auth' }],
+                        });
+                      }
+                    }
+                  ]
+                );
+              } else {
+                Alert.alert('Error', result.message || 'Error al cerrar sesión');
+              }
+            } catch (error) {
+              console.error('Error en logout:', error);
+              Alert.alert('Error', 'Ocurrió un error al cerrar sesión');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
     <ScrollView style={styles.container}>
@@ -25,7 +81,7 @@ export default function AdminPanelScreen({ navigation }) {
 
       <Button title="Ver Lista de Usuarios" onPress={() => alert('Lista de usuarios')} />
       <Button title="Ver Reportes" onPress={() => alert('Generando reportes')} />
-      <Button title="Cerrar Sesión" onPress={() => navigation.goBack()} color="#999" />
+      <Button title="Cerrar Sesión" onPress={handleLogout} color="#ff4444" />
     </ScrollView>
   </SafeAreaView>
   );

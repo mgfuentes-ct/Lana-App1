@@ -139,8 +139,11 @@ def editar_transaccion(id: int, data: TransaccionUpdate, db: Session = Depends(g
             raise HTTPException(status_code=400, detail=f"La categoría es de tipo '{categoria.tipo}', pero enviaste '{tipo_nuevo}'")
 
     # Validar monto si se cambia
-    if 'monto' in cambios and cambios['monto'] <= 0:
-        raise HTTPException(status_code=400, detail="El monto debe ser mayor que cero")
+    if 'monto' in cambios:
+        if cambios['monto'] <= 0:
+            raise HTTPException(status_code=400, detail="El monto debe ser mayor que cero")
+        if cambios['monto'] > 999999999.99:
+            raise HTTPException(status_code=400, detail="El monto no puede ser mayor a $999,999,999.99")
 
     for campo, valor in cambios.items():
         setattr(transaccion, campo, valor)

@@ -21,4 +21,4 @@ class SoporteOut(BaseModel):
     fecha_envio: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True

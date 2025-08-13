@@ -3,7 +3,7 @@
 // Configuración de la API
 export const API_CONFIG = {
   // URL base de la API - cambia según tu entorno
-  BASE_URL: 'http://127.0.0.1:8000',
+  BASE_URL: 'http://192.168.0.105:8000',
   
   // Timeout para las peticiones
   TIMEOUT: 10000,
@@ -30,7 +30,7 @@ export const getApiBaseUrl = () => {
   // En desarrollo, puedes cambiar esto según tu configuración
   if (__DEV__) {
     // Para desarrollo local
-    return 'http://127.0.0.1:8000';
+    return 'http://192.168.0.105:8000';
     // Para desarrollo con dispositivo físico (cambia por tu IP local)
     // return 'http://192.168.1.100:8000';
   }

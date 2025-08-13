@@ -5,3 +5,5 @@ pymysql
 python-jose[cryptography]
 passlib[bcrypt]
 python-dotenv
+fastapi-mail
+jinja2

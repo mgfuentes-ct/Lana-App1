@@ -12,6 +12,7 @@ import {
   ScrollView
 } from 'react-native';
 import { register } from '../services/authService';
+import { useAuth } from '../hooks/useAuth';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -20,6 +21,7 @@ const RegisterScreen = ({ navigation }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const { updateAuthState } = useAuth();
 
   const validateForm = () => {
     const newErrors = {};
@@ -68,16 +70,38 @@ const RegisterScreen = ({ navigation }) => {
       });
 
       if (result.success) {
-        Alert.alert(
-          '¡Registro Exitoso!',
-          'Tu cuenta ha sido creada correctamente. Ahora puedes iniciar sesión.',
-          [
-            {
-              text: 'Iniciar Sesión',
-              onPress: () => navigation.navigate('Login')
-            }
-          ]
-        );
+        // Si el registro incluye información de usuario autenticado
+        if (result.user && result.token) {
+          // Actualizar el contexto de autenticación
+          await updateAuthState(result.token, result.user);
+          
+          // Mostrar alerta de éxito
+          Alert.alert(
+            '¡Registro Exitoso!',
+            'Tu cuenta ha sido creada correctamente. Serás redirigido a la pantalla principal.',
+            [
+              {
+                text: 'Continuar',
+                onPress: () => {
+                  // La navegación se manejará automáticamente por el contexto de autenticación
+                  console.log('Usuario autenticado, navegando automáticamente...');
+                }
+              }
+            ]
+          );
+        } else {
+          // Si no se pudo hacer login automático, mostrar mensaje y redirigir al login
+          Alert.alert(
+            '¡Registro Exitoso!',
+            'Tu cuenta ha sido creada correctamente. Por favor inicia sesión.',
+            [
+              {
+                text: 'Iniciar Sesión',
+                onPress: () => navigation.navigate('Login')
+              }
+            ]
+          );
+        }
       } else {
         Alert.alert('Error', result.message);
       }

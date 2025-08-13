@@ -11,7 +11,10 @@ const Stack = createStackNavigator();
 
 export default function AuthStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerBackTitle: 'Atrás' }}>
+    <Stack.Navigator 
+      initialRouteName="Welcome"
+      screenOptions={{ headerBackTitle: 'Atrás' }}
+    >
       <Stack.Screen name="Welcome" component={WelcomeScreen} options={{ title: 'Bienvenido' }} />
       <Stack.Screen name="Registro" component={RegisterScreen} options={{ title: 'Crear cuenta' }} />
       <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Iniciar sesión' }} />

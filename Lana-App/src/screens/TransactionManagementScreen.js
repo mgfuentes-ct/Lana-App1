@@ -121,7 +121,7 @@ export default function TransactionManagementScreen({ navigation }) {
         
         <TouchableOpacity 
           style={[styles.actionButton, styles.editButton]}
-          onPress={() => navigation.navigate('EditarTransacción', { transaction: item })}
+          onPress={() => navigation.navigate('EditarEliminarTransacción', { transaction: item })}
         >
           <Text style={styles.actionButtonText}>Editar</Text>
         </TouchableOpacity>

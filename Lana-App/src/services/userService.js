@@ -4,17 +4,35 @@ import api from '../utils/api';
 // Obtener perfil del usuario actual
 export const getUserProfile = async () => {
   try {
+    console.log('🔄 Obteniendo perfil del usuario...');
     const response = await api.get('/usuarios/perfil');
+    console.log('✅ Perfil obtenido exitosamente:', response.data);
     return {
       success: true,
       data: response.data,
       message: 'Perfil obtenido exitosamente'
     };
   } catch (error) {
-    console.error('Error getting user profile:', error);
+    console.error('❌ Error getting user profile:', error);
+    console.error('❌ Error response:', error.response?.data);
+    console.error('❌ Error status:', error.response?.status);
+    
+    // Manejar errores específicos
+    let errorMessage = 'Error al obtener el perfil';
+    
+    if (error.response?.data?.detail) {
+      errorMessage = error.response.data.detail;
+    } else if (error.response?.status === 401) {
+      errorMessage = 'Sesión expirada. Inicia sesión nuevamente.';
+    } else if (error.response?.status === 404) {
+      errorMessage = 'Usuario no encontrado.';
+    } else if (error.response?.status === 500) {
+      errorMessage = 'Error del servidor. Inténtalo más tarde.';
+    }
+    
     return {
       success: false,
-      message: error.response?.data?.detail || 'Error al obtener el perfil',
+      message: errorMessage,
       error
     };
   }
@@ -23,17 +41,37 @@ export const getUserProfile = async () => {
 // Actualizar perfil del usuario
 export const updateUserProfile = async (profileData) => {
   try {
+    console.log('🔄 Enviando actualización de perfil:', JSON.stringify(profileData, null, 2));
     const response = await api.put('/usuarios/perfil', profileData);
+    console.log('✅ Perfil actualizado exitosamente:', response.data);
     return {
       success: true,
       data: response.data,
       message: 'Perfil actualizado exitosamente'
     };
   } catch (error) {
-    console.error('Error updating user profile:', error);
+    console.error('❌ Error updating user profile:', error);
+    console.error('❌ Error response:', error.response?.data);
+    console.error('❌ Error status:', error.response?.status);
+    
+    // Manejar errores específicos
+    let errorMessage = 'Error al actualizar el perfil';
+    
+    if (error.response?.data?.detail) {
+      errorMessage = error.response.data.detail;
+    } else if (error.response?.status === 400) {
+      errorMessage = 'Datos inválidos. Verifica la información ingresada.';
+    } else if (error.response?.status === 404) {
+      errorMessage = 'Usuario no encontrado.';
+    } else if (error.response?.status === 403) {
+      errorMessage = 'No tienes permisos para modificar este perfil.';
+    } else if (error.response?.status === 500) {
+      errorMessage = 'Error del servidor. Inténtalo más tarde.';
+    }
+    
     return {
       success: false,
-      message: error.response?.data?.detail || 'Error al actualizar el perfil',
+      message: errorMessage,
       error
     };
   }

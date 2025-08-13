@@ -13,7 +13,7 @@ class PagoFijoResumen(BaseModel):
     estado: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # ---- Resumen por categoría (para gráficas) ----
 class CategoriaResumen(BaseModel):
@@ -24,7 +24,7 @@ class CategoriaResumen(BaseModel):
     porcentaje: float  # respecto al total
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # ---- Resumen de presupuestos ----
 class PresupuestoResumen(BaseModel):
@@ -37,7 +37,7 @@ class PresupuestoResumen(BaseModel):
     excedido: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # ---- Respuesta completa del dashboard ----
 class DashboardResponse(BaseModel):
@@ -51,4 +51,4 @@ class DashboardResponse(BaseModel):
     notificaciones_no_leidas: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True

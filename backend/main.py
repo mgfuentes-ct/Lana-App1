@@ -42,6 +42,7 @@
 #         orm_mode = True
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routes import usuarios
 from routes import transacciones
 from routes import dashboard
@@ -52,6 +53,15 @@ from routes import soporte
 from routes import graficas
 
 app = FastAPI()
+
+# Configuración de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # En producción, especifica los dominios permitidos
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos los métodos HTTP
+    allow_headers=["*"],  # Permite todos los headers
+)
 
 # Rutas
 app.include_router(usuarios.router)
