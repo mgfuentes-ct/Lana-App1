@@ -40,7 +40,7 @@
 
 #     class Config:
 #         orm_mode = True
-
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from routes import usuarios
 from routes import transacciones
@@ -52,6 +52,13 @@ from routes import soporte
 from routes import graficas
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Rutas
 app.include_router(usuarios.router)

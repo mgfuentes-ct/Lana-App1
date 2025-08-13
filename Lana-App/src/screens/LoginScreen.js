@@ -55,9 +55,9 @@ const LoginScreen = ({ navigation }) => {
       if (result.success) {
         // Actualizar el estado de autenticación global
         await updateAuthState(result.token, result.usuario);
-        
+        navigation.navigate('Main', { screen: 'Home' });
         // Login exitoso
-        Alert.alert(
+        Window.alert(
           '¡Bienvenido!',
           'Inicio de sesión exitoso',
           [

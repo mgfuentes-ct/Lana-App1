@@ -1,14 +1,40 @@
 // src/config/apiConfig.js
+import { Platform } from 'react-native';
 
-// Configuración de la API
+// ⚙️ Cambia esta IP a la de tu PC cuando pruebes en dispositivo real
+const LAN_FALLBACK = 'http://192.168.100.78:8000'; // ← AJUSTA si es necesario
+
+// Dev/Prod via variables de entorno (Expo recomienda EXPO_PUBLIC_API_URL)
+const ENV_URL =
+  (typeof process !== 'undefined' &&
+    process.env &&
+    (process.env.EXPO_PUBLIC_API_URL || process.env.API_URL)) ||
+  null;
+
+// Resuelve la baseURL según entorno
+export const getApiBaseUrl = () => {
+  if (ENV_URL) return ENV_URL;
+
+  // Emuladores y web
+  const emulatorURL = Platform.select({
+    android: 'http://192.168.100.78:8000',     // Android Emulator
+    ios: 'http://localhost:8000',        // iOS Simulator
+    default: LAN_FALLBACK,               // Web/otros o dispositivo físico en LAN
+  });
+
+  // En modo producción, si no quieres variables de entorno, puedes cambiar aquí:
+  if (!__DEV__) {
+    // return 'https://tu-api-produccion.com';
+    return emulatorURL || LAN_FALLBACK;
+  }
+
+  // Desarrollo
+  return emulatorURL || LAN_FALLBACK;
+};
+
+// Config por defecto
 export const API_CONFIG = {
-  // URL base de la API - cambia según tu entorno
-  BASE_URL: 'http://127.0.0.1:8000',
-  
-  // Timeout para las peticiones
   TIMEOUT: 10000,
-  
-  // Endpoints de autenticación
   ENDPOINTS: {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',
@@ -17,29 +43,13 @@ export const API_CONFIG = {
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
   },
-  
-  // Headers por defecto
   DEFAULT_HEADERS: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
 };
 
-// Función para obtener la URL base según el entorno
-export const getApiBaseUrl = () => {
-  // En desarrollo, puedes cambiar esto según tu configuración
-  if (__DEV__) {
-    // Para desarrollo local
-    return 'http://127.0.0.1:8000';
-    // Para desarrollo con dispositivo físico (cambia por tu IP local)
-    // return 'http://192.168.1.100:8000';
-  }
-  
-  // En producción, usa tu URL de producción
-  return 'https://tu-api-produccion.com';
-};
-
-// Función para obtener la configuración completa
+// Retorna objeto de config listo para axios.create()
 export const getApiConfig = () => ({
   baseURL: getApiBaseUrl(),
   timeout: API_CONFIG.TIMEOUT,

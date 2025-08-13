@@ -3,8 +3,8 @@
 Script de prueba para verificar los endpoints de autenticación
 """
 
-import requests
-import json
+import requests 
+import json 
 
 # Configuración
 BASE_URL = "http://127.0.0.1:8000"

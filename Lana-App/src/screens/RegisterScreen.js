@@ -61,6 +61,7 @@ const RegisterScreen = ({ navigation }) => {
     setErrors({});
 
     try {
+      console.log('Intentando registrar con:', { name, email, password });
       const result = await register({
         nombre: name.trim(),
         correo: email.trim(),
